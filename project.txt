@@ -1,0 +1,382 @@
+EXERCISE:1
+// Strategy.java
+interface PaymentStrategy {
+    void pay(int amount);
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid " + amount + " using Credit Card.");
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid " + amount + " using PayPal.");
+    }
+}
+
+class ShoppingCart {
+    private PaymentStrategy paymentStrategy;
+
+    public void setPaymentStrategy(PaymentStrategy strategy) {
+        this.paymentStrategy = strategy;
+    }
+
+    public void checkout(int amount) {
+        paymentStrategy.pay(amount);
+    }
+}
+
+// Main.java
+public class StrategyDemo {
+    public static void main(String[] args) {
+        ShoppingCart cart = new ShoppingCart();
+        cart.setPaymentStrategy(new CreditCardPayment());
+        cart.checkout(500);
+
+        cart.setPaymentStrategy(new PayPalPayment());
+        cart.checkout(300);
+    }
+}
+import java.util.*;
+
+// Observer.java
+interface Observer {
+    void update(String message);
+}
+
+class EmailClient implements Observer {
+    private String name;
+    public EmailClient(String name) { this.name = name; }
+
+    public void update(String message) {
+        System.out.println(name + " received: " + message);
+    }
+}
+
+class NewsPublisher {
+    private List<Observer> observers = new ArrayList<>();
+
+    public void subscribe(Observer o) {
+        observers.add(o);
+    }
+
+    public void unsubscribe(Observer o) {
+        observers.remove(o);
+    }
+
+    public void notifyObservers(String news) {
+        for (Observer o : observers) {
+            o.update(news);
+        }
+    }
+}
+
+// Main
+public class ObserverDemo {
+    public static void main(String[] args) {
+        NewsPublisher publisher = new NewsPublisher();
+        Observer alice = new EmailClient("Alice");
+        Observer bob = new EmailClient("Bob");
+
+        publisher.subscribe(alice);
+        publisher.subscribe(bob);
+
+        publisher.notifyObservers("Breaking News: Design Patterns Simplified!");
+    }
+}
+interface Shape {
+    void draw();
+}
+
+class Circle implements Shape {
+    public void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+
+class Square implements Shape {
+    public void draw() {
+        System.out.println("Drawing Square");
+    }
+}
+
+class ShapeFactory {
+    public static Shape getShape(String type) {
+        if (type.equalsIgnoreCase("circle")) return new Circle();
+        else if (type.equalsIgnoreCase("square")) return new Square();
+        else return null;
+    }
+}
+
+// Main
+public class FactoryDemo {
+    public static void main(String[] args) {
+        Shape circle = ShapeFactory.getShape("circle");
+        Shape square = ShapeFactory.getShape("square");
+
+        circle.draw();
+        square.draw();
+    }
+}
+// Target interface
+interface MediaPlayer {
+    void play(String audioType, String fileName);
+}
+
+// Adaptee
+class AdvancedMediaPlayer {
+    public void playMp4(String fileName) {
+        System.out.println("Playing mp4 file: " + fileName);
+    }
+}
+
+// Adapter
+class MediaAdapter implements MediaPlayer {
+    AdvancedMediaPlayer advancedMediaPlayer = new AdvancedMediaPlayer();
+
+    public void play(String audioType, String fileName) {
+        if (audioType.equalsIgnoreCase("mp4")) {
+            advancedMediaPlayer.playMp4(fileName);
+        }
+    }
+}
+
+// Client
+class AudioPlayer implements MediaPlayer {
+    MediaAdapter mediaAdapter;
+
+    public void play(String audioType, String fileName) {
+        if (audioType.equalsIgnoreCase("mp3")) {
+            System.out.println("Playing mp3 file: " + fileName);
+        } else if (audioType.equalsIgnoreCase("mp4")) {
+            mediaAdapter = new MediaAdapter();
+            mediaAdapter.play(audioType, fileName);
+        } else {
+            System.out.println("Invalid media type");
+        }
+    }
+}
+
+// Main
+public class AdapterDemo {
+    public static void main(String[] args) {
+        AudioPlayer player = new AudioPlayer();
+        player.play("mp3", "song.mp3");
+        player.play("mp4", "movie.mp4");
+    }
+}
+interface Coffee {
+    String getDescription();
+    double getCost();
+}
+
+class SimpleCoffee implements Coffee {
+    public String getDescription() { return "Simple Coffee"; }
+    public double getCost() { return 5.0; }
+}
+
+abstract class CoffeeDecorator implements Coffee {
+    protected Coffee decoratedCoffee;
+
+    public CoffeeDecorator(Coffee coffee) {
+        this.decoratedCoffee = coffee;
+    }
+
+    public String getDescription() {
+        return decoratedCoffee.getDescription();
+    }
+
+    public double getCost() {
+        return decoratedCoffee.getCost();
+    }
+}
+
+class MilkDecorator extends CoffeeDecorator {
+    public MilkDecorator(Coffee coffee) { super(coffee); }
+
+    public String getDescription() { return super.getDescription() + ", Milk"; }
+    public double getCost() { return super.getCost() + 1.5; }
+}
+
+// Main
+public class DecoratorDemo {
+    public static void main(String[] args) {
+        Coffee coffee = new SimpleCoffee();
+        System.out.println(coffee.getDescription() + " $" + coffee.getCost());
+
+        Coffee milkCoffee = new MilkDecorator(coffee);
+        System.out.println(milkCoffee.getDescription() + " $" + milkCoffee.getCost());
+    }
+}
+EXERCISE 2:
+enum Direction {
+    N, E, S, W;
+
+    public Direction turnLeft() {
+        return values()[(this.ordinal() + 3) % 4];  // Left = -1 (mod 4)
+    }
+
+    public Direction turnRight() {
+        return values()[(this.ordinal() + 1) % 4];  // Right = +1 (mod 4)
+    }
+}
+interface Command {
+    void execute();
+}
+
+class Position {
+    int x, y;
+    Direction dir;
+
+    public Position(int x, int y, Direction dir) {
+        this.x = x;
+        this.y = y;
+        this.dir = dir;
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ", " + dir + ")";
+    }
+}
+import java.util.List;
+
+class Rover {
+    Position position;
+    Grid grid;
+
+    public Rover(Position pos, Grid grid) {
+        this.position = pos;
+        this.grid = grid;
+    }
+
+    public void move() {
+        int nextX = position.x;
+        int nextY = position.y;
+
+        switch (position.dir) {
+            case N -> nextY++;
+            case E -> nextX++;
+            case S -> nextY--;
+            case W -> nextX--;
+        }
+
+        if (grid.isInside(nextX, nextY) && !grid.hasObstacle(nextX, nextY)) {
+            position.x = nextX;
+            position.y = nextY;
+        } else {
+            System.out.println("Obstacle or boundary at: (" + nextX + ", " + nextY + "), stopping move.");
+        }
+    }
+
+    public void turnLeft() {
+        position.dir = position.dir.turnLeft();
+    }
+
+    public void turnRight() {
+        position.dir = position.dir.turnRight();
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+}
+class MoveCommand implements Command {
+    private Rover rover;
+
+    public MoveCommand(Rover rover) {
+        this.rover = rover;
+    }
+
+    public void execute() {
+        rover.move();
+    }
+}
+
+class LeftCommand implements Command {
+    private Rover rover;
+
+    public LeftCommand(Rover rover) {
+        this.rover = rover;
+    }
+
+    public void execute() {
+        rover.turnLeft();
+    }
+}
+
+class RightCommand implements Command {
+    private Rover rover;
+
+    public RightCommand(Rover rover) {
+        this.rover = rover;
+    }
+
+    public void execute() {
+        rover.turnRight();
+    }
+}
+import java.util.HashSet;
+import java.util.Set;
+
+class GridComponent {}
+
+class Grid extends GridComponent {
+    private int width, height;
+    private Set<String> obstacles;
+
+    public Grid(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.obstacles = new HashSet<>();
+    }
+
+    public void addObstacle(int x, int y) {
+        obstacles.add(x + "," + y);
+    }
+
+    public boolean hasObstacle(int x, int y) {
+        return obstacles.contains(x + "," + y);
+    }
+
+    public boolean isInside(int x, int y) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+}
+import java.util.*;
+
+public class RoverSimulation {
+    public static void main(String[] args) {
+        // Initialize Grid with Obstacles
+        Grid grid = new Grid(10, 10);
+        grid.addObstacle(2, 2);
+        grid.addObstacle(3, 5);
+
+        // Starting Position
+        Position start = new Position(0, 0, Direction.N);
+        Rover rover = new Rover(start, grid);
+
+        // Command Sequence
+        List<Command> commands = new ArrayList<>();
+        commands.add(new MoveCommand(rover)); // M
+        commands.add(new MoveCommand(rover)); // M
+        commands.add(new RightCommand(rover)); // R
+        commands.add(new MoveCommand(rover)); // M
+        commands.add(new LeftCommand(rover)); // L
+        commands.add(new MoveCommand(rover)); // M
+
+        // Execute Commands
+        for (Command cmd : commands) {
+            cmd.execute();
+        }
+
+        // Final Output
+        Position finalPos = rover.getPosition();
+        System.out.println("Final Position: " + finalPos);
+        System.out.println("Status Report: Rover is at " +
+                "(" + finalPos.x + ", " + finalPos.y + ") facing " + finalPos.dir +
+                ". No Obstacles detected.");
+    }
+}
+
